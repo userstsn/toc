@@ -122,9 +122,153 @@ printf("Exiting the program.\n");
 return 0;
 }
 
+PROGRAM 3
+
+To demonstrate the DFA for language L = {w | w starts with 01 and consists of 0s and 1s}
+Source code:
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+enum states {q0, q1, q2, q3};
+enum states delta(enum states s, char ch) {
+enum states curr_state;
+switch (s) {
+case q0:
+if (ch == &#39;0&#39;)
+curr_state = q1;
+
+else
+curr_state = q3;
+break;
+case q1:
+if (ch == &#39;1&#39;)
+curr_state = q2;
+else
+curr_state = q3;
+break;
+case q2:
+if (ch == &#39;0&#39; || ch == &#39;1&#39;)
+curr_state = q2;
+else
+curr_state = q3;
+break;
+case q3:
+curr_state = q3;
+break;
+}
+return curr_state;
+}
+int main() {
+char input[20];
+enum states curr_state;
+int i;
+char choice;
+do {
+curr_state = q0;
+i = 0;
+printf(&quot;Enter the string: &quot;);
+scanf(&quot;%s&quot;, input);
+char ch = input[i];
+while (ch != &#39;\0&#39;) {
+curr_state = delta(curr_state, ch);
+ch = input[++i];
+}
+if (curr_state == q2)
+printf(&quot;Accepted\n&quot;);
+else
+printf(&quot;Rejected\n&quot;);
+printf(&quot;Do you want to enter another string? (y/n): &quot;);
+scanf(&quot; %c&quot;, &amp;choice); // Notice the space before %c to consume the newline character left
+by the previous scanf
+
+} while (choice == &#39;y&#39; || choice == &#39;Y&#39;);
+return 0;
+}
 
 
+Program 4:
+To demonstrate the DFA for language L = {w | has 01 as substring and consists of 0s and 1s}
+Source code:
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+enum states {q0, q1, q2};
+enum states delta(enum states s, char ch) {
+switch (s) {
+case q0:
+return (ch == &#39;0&#39;) ? q1 : q0;
+case q1:
+return (ch == &#39;1&#39;) ? q2 : (ch == &#39;0&#39;) ? q1 : q0;
+case q2:
+return q2;
+default:
+return q0;
+}
+}
+int main() {
+char input[20];
+enum states curr_state;
+char choice;
+do {
+curr_state = q0;
+printf(&quot;Enter the string: &quot;);
+scanf(&quot;%s&quot;, input);
+for (int i = 0; input[i] != &#39;\0&#39;; i++) {
+curr_state = delta(curr_state, input[i]);
+}
+if (curr_state == q2) {
+printf(&quot;Accepted\n&quot;);
+} else {
+printf(&quot;Rejected\n&quot;);
+}
 
+printf(&quot;Do you want to enter another string? (y/n): &quot;);
+scanf(&quot; %c&quot;, &amp;choice);
+} while (choice == &#39;y&#39; || choice == &#39;Y&#39;);
+return 0;
+}
+
+Program 5: To demonstrate the DFA for language L = {w | w has even no of 0’s and consists
+of 0s and 1s} Source code: #include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+enum states {q0, q1};
+enum states delta(enum states s,
+char ch) {
+switch (s) {
+case q0:
+return (ch == &#39;0&#39;) ? q1 :
+q0;
+case q1:
+return (ch == &#39;0&#39;) ? q0 :
+q1;
+default:
+return q0;
+}
+}
+int main() {
+char input[20];
+enum states curr_state;
+char choice;
+do {
+curr_state = q0;
+printf(&quot;Enter the string: &quot;);
+scanf(&quot;%s&quot;, input);
+for (int i = 0; input[i] !=
+&#39;\0&#39;; i++) {
+curr_state =
+delta(curr_state, input[i]);
+}
+
+if (curr_state == q0) {
+printf(&quot;Accepted\n&quot;);
+} else {
+printf(&quot;Rejected\n&quot;);
+}
+printf(&quot;Do you want to
+enter another string? (y/n): &quot;);
+scanf(&quot; %c&quot;, &amp;choice); }
+while (choice == &#39;y&#39; ||
+choice == &#39;Y&#39;);
+return 0;
+}
 
 
 LAB 2
@@ -141,6 +285,7 @@ that end with '10', tracking the pattern to verify the correct ending sequence. 
 problems are:
 
 PROGRAM 1
+Program executing NFA with symbols 0 and 1 accepts those string which end with string 01.
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -206,6 +351,8 @@ printf("Exiting the program.\n");
 return 0;}
 
 PROGRAM 2
+Program executing NFA with symbols 0 and 1 accepts those string which start with 0 and end
+with 1. 
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -269,6 +416,52 @@ printf("Exiting the program.\n");
 return 0;
 }
 
+
+PROGRAM 3
+Implementing NFA for language L={w | w containing 01 substring}
+Source Code:
+#include &lt;stdio.h&gt;
+enum states { q0, q1, q2 };
+enum states delta(enum states s, char ch) {
+switch (s) {
+case q0:
+if (ch == &#39;0&#39;)
+return q1;
+break;
+case q1:
+if (ch == &#39;1&#39;)
+return q2;
+break;
+case q2:
+if (ch == &#39;0&#39;)
+return q1;
+break;
+}
+return q0; // Default to q0 (invalid transition)
+}
+int main() {
+char input[20];
+enum states curr_state;
+char choice;
+
+do {
+curr_state = q0;
+int i = 0;
+printf(&quot;Enter the binary string: &quot;);
+scanf(&quot;%s&quot;, input);
+while (input[i] != &#39;\0&#39;) {
+curr_state = delta(curr_state, input[i]);
+i++;
+}
+if (curr_state == q2)
+printf(&quot;Accepted\n&quot;);
+else
+printf(&quot;Rejected\n&quot;);
+printf(&quot;Do you want to enter another string? (y/n): &quot;);
+scanf(&quot; %c&quot;, &amp;choice);
+} while (choice == &#39;y&#39; || choice == &#39;Y&#39;);
+return 0;
+}
 
 
 
