@@ -1,1 +1,637 @@
-tov
+LAB 1
+TO SIMULATE DFA
+
+DFA refers to deterministic finite automata. Deterministic refers to the uniqueness of the
+computation. The finite automata are called deterministic finite automata if the machine is read
+an input string one symbol at a time. In DFA, there is only one path for specific input from the current state to the next state.DFA does
+not accept the null move, i.e., the DFA cannot change state without any input character.DFA can
+contain multiple final states. State Diagram of the problems are:
+
+PROGRAM 1
+// dfa with 01 ends
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+enum State { STATE_A, STATE_B, STATE_C };
+int main() {
+char str[MAX];
+enum State current_state;
+int i;
+char choice;
+
+do {
+
+printf("Enter the string to be checked (press 'q' to quit): ");
+scanf(" %s", str); // Note the space before %s to consume any leading whitespace
+
+if (strcmp(str, "q") == 0) {
+break; // Exit the loop if 'q' is entered
+}
+current_state = STATE_A; // Reset the initial state for each new string
+for (i = 0; str[i] != '\0'; i++) {
+switch (current_state) {
+case STATE_A:
+if (str[i] == '0')
+current_state = STATE_B;
+else if (str[i] == '1')
+current_state = STATE_A;
+break;
+case STATE_B:
+if (str[i] == '0')
+current_state = STATE_B;
+else if (str[i] == '1')
+current_state = STATE_C;
+break;
+case STATE_C:
+if (str[i] == '0')
+current_state = STATE_B;
+else if (str[i] == '1')
+current_state = STATE_A;
+break;
+}
+}
+
+if (current_state == STATE_C)
+printf("String is accepted\n");
+else
+printf("String is not accepted\n");
+} while (1);
+printf("Exiting the program.\n");
+return 0;
+}
+
+PROGRAM 2
+
+// dfa 1 start 0 end
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+enum State { START, STATE_A, STATE_B, STATE_C, REJECT };
+int main() {
+char str[MAX];
+enum State current_state;
+int i;
+char choice;
+do {
+printf("Enter the string to be checked (press 'q' to quit): ");
+scanf(" %s", str);
+if (strcmp(str, "q") == 0) {
+break; // Exit the loop if 'q' is entered
+}
+
+current_state = START;
+
+for (i = 0; str[i] != '\0'; i++) {
+switch (current_state) {
+case START:
+if (str[i] == '1')
+current_state = STATE_A;
+else
+current_state = REJECT;
+break;
+case STATE_A:
+if (str[i] == '0')
+current_state = STATE_B;
+else if (str[i] == '1')
+current_state = STATE_A;
+else
+current_state = REJECT;
+break;
+case STATE_B:
+if (str[i] == '0')
+current_state = STATE_B;
+else if (str[i] == '\0')
+current_state = STATE_C;
+else
+current_state = REJECT;
+break;
+case STATE_C:
+current_state = REJECT;
+break;
+case REJECT:
+break; }
+
+}
+if (current_state == STATE_C)
+printf("String is accepted\n");
+else
+printf("String is not accepted\n");
+} while (1);
+printf("Exiting the program.\n");
+
+return 0;
+}
+
+
+
+
+
+
+LAB 2
+Simulate Non Deterministic Finite Automata (NFA)
+
+
+A Non-deterministic Finite Automaton (NFA) is a computational model used to recognize
+patterns in strings with more flexibility compared to a DFA. Unlike DFAs, NFAs allow multiple
+possible transitions for a given input symbol and can be in multiple states simultaneously. This
+non-determinism helps NFAs to efficiently handle complex pattern recognition tasks. In this experiment, we implemented two NFAs to match specific binary string patterns. The first
+NFA accepts strings that start with '0' and end with '1'. It transitions between states based on
+these conditions, ensuring that the string meets both criteria. The second NFA accepts strings
+that end with '10', tracking the pattern to verify the correct ending sequence. State Diagram of the
+problems are:
+
+PROGRAM 1
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#define MAX 100
+#define MAX_STATES 3
+enum State { STATE_A, STATE_B, STATE_C };
+int main() {
+char str[MAX];
+enum State current_states[MAX_STATES];
+int num_current_states;
+int i;
+do {
+printf("Enter the string to be checked ");
+
+scanf(" %s", str);
+if (strcmp(str, "q") == 0) {
+break;
+}
+num_current_states = 1;
+current_states[0] = STATE_A; // Initial state
+
+for (i = 0; str[i] != '\0'; i++) {
+enum State next_states[MAX_STATES];
+int num_next_states = 0;
+
+for (int j = 0; j < num_current_states; j++) {
+if (current_states[j] == STATE_A) {
+if (str[i] == '0')
+next_states[num_next_states++] = STATE_B;
+if (str[i] == '1')
+next_states[num_next_states++] = STATE_A;
+} else if (current_states[j] == STATE_B) {
+if (str[i] == '0')
+next_states[num_next_states++] = STATE_B;
+if (str[i] == '1')
+next_states[num_next_states++] = STATE_C;
+} else if (current_states[j] == STATE_C) {
+if (str[i] == '0')
+next_states[num_next_states++] = STATE_B;
+if (str[i] == '1')
+next_states[num_next_states++] = STATE_A;
+}
+}
+
+num_current_states = num_next_states;
+for (int j = 0; j < num_next_states; j++) {
+current_states[j] = next_states[j];
+}
+}
+bool accepted = false;
+for (int j = 0; j < num_current_states; j++) {
+if (current_states[j] == STATE_C) {
+accepted = true;
+break;
+}
+}
+if (accepted)
+printf("String is accepted\n");
+else
+printf("String is not accepted\n");
+} while (1);
+printf("Exiting the program.\n");
+return 0;}
+
+PROGRAM 2
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#define MAX 100
+#define MAX_STATES 4
+enum State { START, S0, S01, ACCEPT };
+int main() {
+char str[MAX];
+enum State current_states[MAX_STATES];
+int num_current_states;
+int i;
+do {
+printf("Enter the string to be checked ");
+scanf(" %s", str);
+if (strcmp(str, "q") == 0) {
+break;
+}
+num_current_states = 1;
+current_states[0] = START; // Initial state
+
+for (i = 0; str[i] != '\0'; i++) {
+enum State next_states[MAX_STATES];
+int num_next_states = 0;
+
+for (int j = 0; j < num_current_states; j++) {
+if (current_states[j] == START) {
+if (str[i] == '0')
+next_states[num_next_states++] = S0;
+} else if (current_states[j] == S0) {
+
+if (str[i] == '0')
+next_states[num_next_states++] = S0;
+if (str[i] == '1')
+next_states[num_next_states++] = S01;
+} else if (current_states[j] == S01) {
+if (str[i] == '0')
+next_states[num_next_states++] = S0;
+if (str[i] == '1')
+next_states[num_next_states++] = S01;
+}
+}
+num_current_states = num_next_states;
+for (int j = 0; j < num_next_states; j++) {
+current_states[j] = next_states[j];
+}
+}
+bool accepted = false;
+for (int j = 0; j < num_current_states; j++) {
+if (current_states[j] == S01) {
+accepted = true;
+break;
+}
+}
+if (accepted)
+printf("String is accepted\n");
+else
+printf("String is not accepted\n");
+} while (1);
+printf("Exiting the program.\n");
+
+return 0;
+}
+
+
+
+
+
+LAB 3
+To Simulate Pushdown Automata (PDA)
+Pushdown Automata (PDA) is a computational model that extends finite automata by
+incorporating an auxiliary data structure known as a stack. This stack allows PDAs to have more computational power, enabling them to recognize a broader class of languages known as context-free languages (CFLs). A PDA is formally defined as a 7-tuple:
+PDA=(Q,Σ,Γ,δ,q0,Z0,F)
+Where:
+● Q is a finite set of states.
+● Σ is the input alphabet (finite set of symbols).
+● Γ is the stack alphabet (symbols that can be pushed onto or popped from the stack).
+● δ is the transition function, δ:Q×(Σ∪{ϵ})×Γ→P(Q×Γ∗), which determines the next state
+and the stack operation.
+● q₀ is the initial state (where the computation starts).
+● Z₀ is the initial stack symbol (at the bottom of the stack).
+● F is the set of accepting states.
+
+To demonstrate the PDA for language L = {0n1n | n>=1 over {0,1}}
+Source code:
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#define MAX 100
+
+// Stack operations
+int top = -1;
+char stack[MAX];
+
+// Function to push a character onto the stack
+void push(char c) {
+    if (top == MAX - 1) {
+        printf("Stack overflow!\n");
+    } else {
+        stack[++top] = c;
+    }
+}
+
+// Function to pop a character from the stack
+char pop() {
+    if (top == -1) {
+        return '\0'; // Stack underflow, return null character
+    } else {
+        return stack[top--];
+    }
+}
+
+// Function to check if the stack is empty
+bool isEmpty() {
+    return top == -1;
+}
+
+// Function to check if a string is accepted by the PDA
+bool isAcceptedPDA(char *input) {
+    int len = strlen(input);
+
+    // Traverse through the input string
+    for (int i = 0; i < len; i++) {
+        if (input[i] == '0') {
+            // Push '0' onto the stack when encountering '0'
+            push('0');
+        } else if (input[i] == '1') {
+            // Pop '0' from the stack when encountering '1'
+            if (pop() != '0') {
+                return false; // Unmatched '1', reject the input
+            }
+        } else {
+            // If any character other than '0' or '1' is found, reject
+            return false;
+        }
+    }
+
+    // If the stack is empty after reading the string, accept the input
+    return isEmpty();
+}
+
+int main() {
+    char input[MAX];
+
+    // Input the string
+    printf("Enter a string (over {0, 1}): ");
+    scanf("%s", input);
+
+    // Check if the string is accepted by the PDA
+    if (isAcceptedPDA(input)) {
+        printf("The string is accepted by the PDA.\n");
+    } else {
+        printf("The string is rejected by the PDA.\n");
+    }
+
+    return 0;
+}
+
+To demonstrate the PDA for language L = {anbmcn | m,n>=1 over {0,1}}
+Source code:
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#define MAX 100
+
+// Stack implementation
+int top = -1;
+char stack[MAX];
+
+// Push operation for the stack
+void push(char c) {
+    if (top == MAX - 1) {
+        printf("Stack overflow!\n");
+    } else {
+        stack[++top] = c;
+    }
+}
+
+// Pop operation for the stack
+char pop() {
+    if (top == -1) {
+        return '\0'; // Stack underflow, return null character
+    } else {
+        return stack[top--];
+    }
+}
+
+// Check if the stack is empty
+bool isEmpty() {
+    return top == -1;
+}
+
+// Function to check if the string is accepted by the PDA
+bool isAcceptedPDA(char *input) {
+    int i = 0;
+    int len = strlen(input);
+
+    // Step 1: Process 'a's (push onto the stack)
+    while (i < len && input[i] == 'a') {
+        push('a');
+        i++;
+    }
+
+    // Step 2: Process 'b's (ignore, as they don't affect the stack)
+    while (i < len && input[i] == 'b') {
+        i++;
+    }
+
+    // Step 3: Process 'c's (pop from the stack)
+    while (i < len && input[i] == 'c') {
+        if (pop() != 'a') {
+            return false; // Unmatched 'c', reject the input
+        }
+        i++;
+    }
+
+    // Final check: the stack must be empty, and all input processed
+    return isEmpty() && i == len;
+}
+
+int main() {
+    char input[MAX];
+
+    // Input the string
+    printf("Enter a string (over {a, b, c}): ");
+    scanf("%s", input);
+
+    // Check if the string is accepted by the PDA
+    if (isAcceptedPDA(input)) {
+        printf("The string is accepted by the PDA.\n");
+    } else {
+        printf("The string is rejected by the PDA.\n");
+    }
+
+    return 0;
+}
+
+
+
+
+LAB 4
+To Simulate Turing Machine
+A Turing Machine (TM) is a theoretical computational model introduced by Alan Turing in
+1936 to formalize the concept of computation and algorithms. It is one of the most powerful
+models of computation and forms the foundation of modern computer science and automata
+theory.
+Formal Definition:
+A Turing Machine is formally defined as a 7-tuple: M=(Q,Σ,Γ,δ,q0,F,Z0 ) where:
+A Pushdown Automaton (PDA) is defined as a 7-tuple:
+M=(Q,Σ,Γ,δ,q0,F,Z0)
+where:
+● Q is a finite set of states.
+● Σ is the input alphabet (a finite set of symbols the PDA can read from the input tape).
+● Γ is the stack alphabet (a finite set of symbols the PDA can push onto or pop from the
+stack).
+● δ is the transition function, defined as: δ:Q×(Σ∪{ϵ})×Γ→P(Q×Γ∗)
+● q0∈Q is the initial state.
+● F⊆Q is the set of accepting states.
+● Z0∈Γ is the initial stack symbol, which is the starting symbol on the stack before any
+input is processed.
+
+To demonstrate the Turing Machine for language L = {anbncn | n>=1}
+Source code:
+#include <stdio.h>
+#include <string.h>
+
+// Function to check if the string belongs to the language L = {aⁿbⁿcⁿ | n >= 1}
+int checkLanguage(const char *str) {
+    int len = strlen(str);
+    int i = 0, j, k;
+
+    // Check if the length is divisible by 3
+    if (len % 3 != 0) {
+        return 0; // Reject if the length is not a multiple of 3
+    }
+
+    // Step 1: Find the segment of 'a's
+    while (i < len && str[i] == 'a') {
+        i++;
+    }
+
+    // Check if there are no 'a's or if the entire string is 'a'
+    if (i == 0 || i == len) {
+        return 0;
+    }
+
+    // Step 2: Find the segment of 'b's
+    j = i;
+    while (j < len && str[j] == 'b') {
+        j++;
+    }
+
+    // Check if there are no 'b's or the string ends here
+    if (j == i || j == len) {
+        return 0;
+    }
+
+    // Step 3: Find the segment of 'c's
+    k = j;
+    while (k < len && str[k] == 'c') {
+        k++;
+    }
+
+    // Check if all remaining characters are 'c' and the three segments are of equal length
+    return k == len && (i == (j - i)) && (i == (k - j));
+}
+
+int main() {
+    char input[100];
+    printf("Enter a string: ");
+    scanf("%s", input);
+
+    // Check if the input string is accepted by the Turing Machine
+    if (checkLanguage(input)) {
+        printf("Accepted by Turing Machine\n");
+    } else {
+        printf("Rejected by Turing Machine\n");
+    }
+
+    return 0;
+}
+Program 2:
+To demonstrate the Turing Machine to add two integers.
+Source code:
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+
+// Function to simulate a Turing Machine that adds two unary numbers
+void simulateTM(char tape[]) {
+    int head = 0; // Tape head starts at the beginning
+    int length = strlen(tape);
+
+    // Step 1: Move the head to the '+' symbol
+    while (tape[head] != '+' && head < length) {
+        head++;
+    }
+
+    // Step 2: Erase the '+' symbol
+    tape[head] = 'B'; // Replace '+' with a blank ('B')
+
+    // Step 3: Move '1's from the second number to the first number
+    int readHead = head + 1; // Start reading after the erased '+'
+    while (tape[readHead] != 'B' && readHead < length) {
+        if (tape[readHead] == '1') {
+            // Move '1' from the second number to the first
+            tape[readHead] = 'B'; // Erase the '1' in the second number
+            tape[head] = '1';      // Append '1' to the first number
+            head++;                // Move the head to the next position
+        }
+        readHead++;
+    }
+
+    printf("Final tape (result in unary): %s\n", tape);
+}
+
+int main() {
+    char tape[MAX];
+
+    // Input format: unary number, '+', unary number
+    // Example: "111+11" represents 3 + 2
+    printf("Enter the tape (e.g., 111+11 for 3 + 2): ");
+    scanf("%s", tape);
+
+    // Simulate the Turing Machine to perform addition
+    simulateTM(tape);
+
+    return 0;
+}
+
+
+
+Program 3:
+To demonstrate the Turing Machine to multiply two integers
+Source code:
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to simulate the Turing Machine for multiplication
+int turing_multiply(int a, int b) {
+    int result = 0;
+    int steps = 0;
+
+    // Perform bitwise multiplication
+    while (b > 0) {
+        if (b & 1) { // If the current bit of b is 1, add a to the result
+            result += a;
+        }
+
+        // Left shift 'a' and right shift 'b'
+        a <<= 1; // Equivalent to multiplying 'a' by 2
+        b >>= 1; // Equivalent to dividing 'b' by 2
+        steps++; // Count the number of steps
+    }
+
+    printf("Total steps in Turing Machine: %d\n", steps); // Optional: shows the number of steps
+    return result;
+}
+
+int main() {
+    int num1, num2;
+
+    // Input two integers
+    printf("Enter first integer: ");
+    scanf("%d", &num1);
+    printf("Enter second integer: ");
+    scanf("%d", &num2);
+
+    // Handle negative cases
+    int is_negative = 0;
+    if (num1 < 0) {
+        num1 = -num1;
+        is_negative = !is_negative;
+    }
+    if (num2 < 0) {
+        num2 = -num2;
+        is_negative = !is_negative;
+    }
+
+    // Perform multiplication
+    int result = turing_multiply(num1, num2);
+
+    // Adjust result if the original multiplication involved negative numbers
+    if (is_negative) {
+        result = -result;
+    }
+
+    printf("The result of multiplication is: %d\n", result);
+    return 0;
+}
